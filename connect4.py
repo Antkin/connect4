@@ -99,45 +99,44 @@ class connect4:
         
         if (depth == 0) or gameOver:
             if gameOver:
-                print("EOG Scenario detected for player "+str(prevPlayer))
+                #print("EOG Scenario detected for player "+str(prevPlayer))
                 #Human win
                 if (prevPlayer == 1):
-                    return -1
+                    return (None, -1)
                 #AI win
                 elif (prevPlayer == 2):
-                    return 1
+                    return (None, 1)
                 #No win
                 else:
-                    return 0
+                    return (None, 0)
             
             #reached 0 depth
             else:
-                return 0
+                return (None, 0)
         
         if (maximizingPlayer):
             value = -100000
             for moves in self.possibleMoves(state):
                 newState = self.create_board_copy(state)
                 self.makeMove(newState, moves, currPlayer)
-                newValue = self.minimax(newState, depth - 1, False)
-                
+                move, newValue = self.minimax(newState, depth - 1, False)
+                #print("Move "+str(moves)+" results in value "+str(newValue))
                 if newValue > value:
-                    print("New value detected")
                     value = newValue
                     collumn = moves
-            return collumn
+            return collumn, value
         
         else:
             value = 100000
             for moves in self.possibleMoves(state):
                 newState = self.create_board_copy(state)
                 self.makeMove(newState, moves, currPlayer)
-                newValue = self.minimax(newState, depth - 1, True)
+                move, newValue = self.minimax(newState, depth - 1, True)
                 
                 if newValue < value:
                     value = newValue
                     collumn = moves
-            return collumn
+            return collumn, value
             
         
         
@@ -205,10 +204,10 @@ class connect4:
             
             #AI Turn
             else:
-                val = self.minimax(board, 4, True)
-                if self.isValidMove(board, val):
-                    print("AI playing on collumn "+str(val))
-                    self.makeMove(board, val, currTurn)
+                collumn, value = self.minimax(board, 4, True)
+                if self.isValidMove(board, collumn):
+                    print("AI playing on collumn "+str(collumn))
+                    self.makeMove(board, collumn, currTurn)
                     
                     if self.winningMove(board, currTurn):
                         print(board)
