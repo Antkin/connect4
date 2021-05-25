@@ -93,8 +93,8 @@ class connect4:
             for row in range(rows - 2):
                 if inputBoard[row][collumn] == playerNum and inputBoard[row+1][collumn] == playerNum and inputBoard[row+2][collumn] == playerNum:
                     #In the vertical case we just need to check placing a chip on top
-                    if(row < rows - 3):
-                        if inputBoard[row+3][collumn] == 0: count += 5
+                    if(row > 0):
+                        if inputBoard[row-1][collumn] == 0: count += 5
                         
                 
         #Check for backward slash type threes aka \
@@ -251,9 +251,7 @@ class connect4:
                 
             else:
                 print("Unrecognized input, please enter 0, 1, or 2.")
-                return 0
             
-        gameOver = False
         board = self.create_new_board()
         correctTurn = False
         
@@ -265,9 +263,13 @@ class connect4:
             #Human Turn
             if (currTurn == 1):
                 while(not correctTurn):
-                    val = input("Human 1 players turn! Please enter the collumn you would like to drop your chip into, starting from 1 and ending at 7.")
-                    #User puts in a num from 1-7, but array indices are 0-6
-                    val = int(val) - 1
+                    try:
+                        val = input("Human 1 players turn! Please enter the collumn you would like to drop your chip into, starting from 1 and ending at 7.")
+                        #User puts in a num from 1-7, but array indices are 0-6
+                        val = int(val) - 1
+                    except:
+                        print("Error: Please enter a numerical digit.")
+                        continue
                     
                     if self.isValidMove(board, val):
                         correctTurn = True
