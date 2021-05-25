@@ -206,7 +206,7 @@ class connect4:
             else:
                 collumn, value = self.minimax(board, 4, True)
                 if self.isValidMove(board, collumn):
-                    print("AI playing on collumn "+str(collumn))
+                    print("AI playing on collumn "+str(collumn + 1))
                     self.makeMove(board, collumn, currTurn)
                     
                     if self.winningMove(board, currTurn):
