@@ -1,31 +1,37 @@
-import connect4
+from connect4 import connect4
 
-class connect4TesterCode:
-    testHorizontal = connect4.create_new_board()
-    testVertical = connect4.create_new_board()
-    testForwardDiagnol = connect4.create_new_board()
-    testBackwardDiagnol = connect4.create_new_board()
+
+tester = connect4()
     
-    #Vertical 
-    while(True):
-        if(connect4.isValidMove(testVertical, 3)):
-            connect4.makeMove(testVertical, 3, 1)
-        else:
-            break
-     
-    print("Vertical Test")
-    print(testVertical)
-    print(connect4.winningMove(testVertical, 1))
+testHorizontal = tester.create_new_board()
+testVertical = tester.create_new_board()
+testForwardDiagnol = tester.create_new_board()
+testBackwardDiagnol = tester.create_new_board()
+
+#Vertical 
+while(True):
+    if(tester.isValidMove(testVertical, 3)):
+        tester.makeMove(testVertical, 3, 1)
+    else:
+        break
+ 
+print("Vertical Test")
+print(testVertical)
+print(tester.winningMove(testVertical, 1))
+
+#Horizontal
+pointer = 0
+while(True):
+    if(tester.isValidMove(testHorizontal, pointer)):
+        tester.makeMove(testHorizontal, pointer, 1)
+        pointer += 1
+    else:
+        break
     
-    #Horizontal
-    pointer = 0
-    while(True):
-        if(connect4.isValidMove(testHorizontal, pointer)):
-            connect4.makeMove(testHorizontal, pointer, 1)
-            pointer += 1
-        else:
-            break
-        
-    print("Horizontal Test")
-    print(testHorizontal)
-    print(connect4.winningMove(testHorizontal, 1))
+print("Horizontal Test")
+print(testHorizontal)
+print(str(tester.winningMove(testHorizontal, 1)) + "\n")
+
+print("Empty space test")
+print(tester.emptySpace(testHorizontal, 0, 4))
+    
