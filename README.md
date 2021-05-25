@@ -1,3 +1,4 @@
 # connect4
-Simple human vs AI connect 4 game
-This branch will be testing an improved heuristic which will take into account the number of 3 in a rows and how easily the row of 3 can be made into a row of 4
+Human vs AI connect 4 games. Uses minimax (no a/b pruning atm) to choose decent moves. Current heuristic looks at 1) game winning moves,
+and 2) moves where theres 3 chips in a row and a 4th chip can be added. Only looks at the _xxx_ case for now as opposed
+to the x_xx type cases.
