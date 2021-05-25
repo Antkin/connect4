@@ -1,19 +1,52 @@
 import numpy as np
 import random as rand
 import math
+import pygame
+import sys
 
 class connect4:
     global rows
-    global collumns
-    global empty
-    global humanPlayer
-    global aiPlayer
+    global collumns, empty, humanPlayer, aiPlayer
+    global background, red_chip, yellow_chip, empty_chip
+    global squaresize, windowWidth, windowHeight, chipSlotRadius, screen
+    
     
     rows = 6
     collumns = 7
     empty = 0
     humanPlayer = 1
     aiPlayer = 2
+    
+    #Pygame variables
+    background = (0, 0 ,0)
+    red_chip = (255, 0 , 0)
+    yellow_chip = (255, 255, 0)
+    empty_chip = (255, 255, 255)
+    
+    squaresize = 100
+    windowWidth = squaresize * collumns
+    windowHeight = squaresize * (rows + 1)
+    chipSlotRadius = (squaresize // 2) - 5
+    
+    screen = pygame.display.set_mode((windowWidth, windowHeight))
+    pygame.init()
+    
+    #draws pygame board
+    def draw_board(self, state):
+        for collumn in range(collumns):
+            for row in range(rows):
+                pygame.draw.rect(screen, background, (collumn * squaresize, row * squaresize + squaresize, squaresize, squaresize))
+                pygame.draw.circle(screen, empty_chip, (collumn * squaresize + squaresize // 2, row * squaresize + squaresize + squaresize // 2), chipSlotRadius)
+        
+        for collumn in range(collumns):
+            for row in range(rows):
+                if state[row][collumn] == 1:
+                    pygame.draw.circle(screen, red_chip, (collumn * squaresize + squaresize // 2, windowHeight - (rows - row) * squaresize + squaresize // 2), chipSlotRadius)
+                 
+                elif state[row][collumn] == 2:
+                    pygame.draw.circle(screen, yellow_chip, (collumn * squaresize + squaresize // 2, windowHeight - (rows - row) * squaresize + squaresize // 2), chipSlotRadius)
+                  
+        pygame.display.update()
     
     #Creates empty board
     def create_new_board(self):
@@ -57,7 +90,7 @@ class connect4:
             else:
                 rowPointer += 1
                 
-    #Looks at the number of chips that need to be placed to reach a certain collumn in a row
+    #Looks at the number of chips that need to be placed to reach a certain row in a collumn
     def emptySpace(self, inputBoard, row, collumn):
         count = 0
         pointer = row
@@ -131,6 +164,15 @@ class connect4:
                 
         return count
     
+    #Check for a tie
+    def tieDetector(self, inputBoard):
+        for collumn in range(collumns):
+            for row in range(rows):
+                if inputBoard[row][collumn] == 0:
+                    return False
+                
+        return True
+    
     #Checks if there is a winning combination
     def winningMove(self, inputBoard, playerNum):
         #Check for horizontal wins
@@ -159,6 +201,7 @@ class connect4:
                 
         return False
         
+    #Minimax algorithm -- the "brains" of the AI
     def minimax(self, state, depth, maximizingPlayer):
         currPlayer = 0
         prevPlayer = 0
@@ -170,19 +213,20 @@ class connect4:
             prevPlayer = 2
         
         gameOver = self.winningMove(state, prevPlayer)
+        tie = self.tieDetector(state)
         
-        if (depth == 0) or gameOver:
+        if (depth == 0) or gameOver or tie:
             if gameOver:
                 #print("EOG Scenario detected for player "+str(prevPlayer))
                 #Human win
                 if (prevPlayer == 1):
-                    return (None, -100000 * depth + 1)
+                    return (None, -100000 * (depth + 1))
                 #AI win
                 elif (prevPlayer == 2):
-                    return (None, 100000 * depth + 1)
+                    return (None, 100000 * (depth + 1))
                 #No win -- kind of useless rn because we dont detect ties
-                else:
-                    return (None, 0)
+            elif tie:
+                return (None, 0)
             
             #reached 0 depth -- lets see how many 3's we have
             else:
@@ -216,7 +260,7 @@ class connect4:
             return collumn, value
             
         
-        
+    #Handles the gameplay    
     def play(self):
         playerSelection = True
         
@@ -253,66 +297,76 @@ class connect4:
                 print("Unrecognized input, please enter 0, 1, or 2.")
             
         board = self.create_new_board()
-        correctTurn = False
+        self.draw_board(board)
+        pygame.display.update()
+        gameOver = False
         
-        print("Initial game state is:")
-        print(board)
-        print()
-        
-        while (True):
-            #Human Turn
-            if (currTurn == 1):
-                while(not correctTurn):
-                    try:
-                        val = input("Human 1 players turn! Please enter the collumn you would like to drop your chip into, starting from 1 and ending at 7.")
-                        #User puts in a num from 1-7, but array indices are 0-6
-                        val = int(val) - 1
-                    except:
-                        print("Error: Please enter a numerical digit.")
-                        continue
+        while (not gameOver):
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
                     
-                    if self.isValidMove(board, val):
-                        correctTurn = True
-                        self.makeMove(board, val, currTurn)
+                if event.type == pygame.MOUSEMOTION:
+                    pygame.draw.rect(screen, empty_chip, (0,0, windowWidth, squaresize))
+                    posX = event.pos[0]
+                    if currTurn == 1:
+                        pygame.draw.circle(screen, red_chip, (posX, squaresize // 2), chipSlotRadius)
+                
+                pygame.display.update()
+                
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    pygame.draw.rect(screen, empty_chip, (0, 0, windowWidth, squaresize))
+                    
+                
+                    if (currTurn == 1):
+                        #Human Turn
+                        posX = event.pos[0]
+                        val = math.floor(posX // squaresize)
                         
-                        if self.winningMove(board, currTurn):
-                            print(board)
-                            print("Human winner!!!")
-                            return 0
-                        
-                    else:
-                        print("This is not a valid move, please try again!")
+                        if self.isValidMove(board, val):
+                            self.makeMove(board, val, currTurn)
+                            
+                            self.draw_board(board)
+                            
+                            if self.winningMove(board, currTurn):
+                                gameOver = True
+                                print("Human winner!!!")
+                                
+                            if(currTurn == 1):
+                                currTurn = 2
+                            else:
+                                currTurn = 1
+                            
+                        else:
+                            print("This is not a valid move, please try again!")
             
             #AI Turn
-            else:
+            if (currTurn == 2 and not gameOver):
                 collumn, value = self.minimax(board, 4, True)
                 if self.isValidMove(board, collumn):
                     print("AI playing on collumn "+str(collumn + 1))
                     self.makeMove(board, collumn, currTurn)
                     
-                    if self.winningMove(board, currTurn):
-                        print(board)
-                        print("AI Winner!")
-                        return 0
+                    self.draw_board(board)
                     
-                else:
-                    print("AI ERROR")
-                    return 0
-                
-            if(currTurn == 1):
-                currTurn = 2
-            else:
-                currTurn = 1
-                
-            correctTurn = False
-            
-            print("Current game state is")
-            print(board)
-            print()
-                
-            
-
-                
+                    if self.winningMove(board, currTurn):
+                        gameOver = True
+                        print("AI Winner!!!")
+                        
+                    if(currTurn == 1):
+                        currTurn = 2
+                    else:
+                        currTurn = 1
+        
+        if gameOver:
+            while(True):
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        sys.exit()
+                        return 0
+                        
 game = connect4()
 game.play()
    
