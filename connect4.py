@@ -94,7 +94,7 @@ class connect4:
                 if inputBoard[row][collumn] == playerNum and inputBoard[row+1][collumn] == playerNum and inputBoard[row+2][collumn] == playerNum:
                     #In the vertical case we just need to check placing a chip on top
                     if(row < rows - 3):
-                        if inputBoard[row+3][collumn] == 0: count += 10
+                        if inputBoard[row+3][collumn] == 0: count += 5
                         
                 
         #Check for backward slash type threes aka \
@@ -176,17 +176,20 @@ class connect4:
                 #print("EOG Scenario detected for player "+str(prevPlayer))
                 #Human win
                 if (prevPlayer == 1):
-                    return (None, -100)
+                    return (None, -100000 * depth + 1)
                 #AI win
                 elif (prevPlayer == 2):
-                    return (None, 100)
+                    return (None, 100000 * depth + 1)
                 #No win -- kind of useless rn because we dont detect ties
                 else:
                     return (None, 0)
             
             #reached 0 depth -- lets see how many 3's we have
             else:
-                return (None, self.threeInARow(state, currPlayer))
+                if prevPlayer == 1:
+                    return (None, -self.threeInARow(state, prevPlayer))
+                else:
+                    return (None, self.threeInARow(state, prevPlayer))
         
         if (maximizingPlayer):
             value = -math.inf
