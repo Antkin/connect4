@@ -57,6 +57,57 @@ class connect4:
             else:
                 rowPointer += 1
     
+    #Another heuristic function which will check how many "three in a row" cases there are. We only
+    #consider the cases where a 4th chip could be player
+    def threeInARow(self, inputBoard, playerNum):
+        count= 0
+        #Check for horizontal threes aka -
+        for collumn in range(collumns - 2):
+            for row in range(rows):
+                if inputBoard[row][collumn] == playerNum and inputBoard[row][collumn+1] == playerNum and inputBoard[row][collumn+2] == playerNum:
+                    #Check to the left as long as we are not at 0
+                    if(collumn > 0):
+                        if inputBoard[row][collumn - 1] == 0: count += 1
+                    
+                    #Check to the right
+                    if (collumn < collumns - 3):
+                        if inputBoard[row][collumn + 3] == 0: count += 1
+                
+        #Check for vertical threes aka |
+        for collumn in range(collumns):
+            for row in range(rows - 2):
+                if inputBoard[row][collumn] == playerNum and inputBoard[row+1][collumn] == playerNum and inputBoard[row+2][collumn] == playerNum:
+                    #In the vertical case we just need to check placing a chip on top
+                    if(row < rows - 3):
+                        if inputBoard[row+3][collumn] == 0: count += 1
+                        
+                
+        #Check for backward slash type threes aka \
+        for collumn in range(collumns-2):
+            for row in range(rows-2):
+                if inputBoard[row][collumn] == playerNum and inputBoard[row+1][collumn+1] == playerNum and inputBoard[row+2][collumn+2] == playerNum:
+                    #Check upper left pos
+                    if(row > 0 and collumn > 0):
+                        if inputBoard[row - 1][collumn - 1] == 0: count += 1
+                    
+                    #Check lower right pos
+                    if(row < rows - 3 and collumn < collumns - 3):
+                        if inputBoard[row + 3][collumn + 3]: count += 1
+                    
+        #Check for forward slash type threes aka /
+        for collumn in range(collumns-2):
+            for row in range(2, rows):
+                if inputBoard[row][collumn] == playerNum and inputBoard[row-1][collumn+1] == playerNum and inputBoard[row-2][collumn+2] == playerNum:
+                    #Check lower left pos
+                    if(collumn > 0 and row < row - 1):
+                        if inputBoard[row + 1][collumn - 1] == 0: count += 1
+                    
+                    #Check upper right pos
+                    if(collumn < collumns - 3 and row > 0):
+                        if inputBoard[row - 1][collumn + 3] == 0: count += 1
+                
+        return count
+    
     #Checks if there is a winning combination
     def winningMove(self, inputBoard, playerNum):
         #Check for horizontal wins
@@ -102,20 +153,20 @@ class connect4:
                 #print("EOG Scenario detected for player "+str(prevPlayer))
                 #Human win
                 if (prevPlayer == 1):
-                    return (None, -1)
+                    return (None, -100)
                 #AI win
                 elif (prevPlayer == 2):
-                    return (None, 1)
-                #No win
+                    return (None, 100)
+                #No win -- kind of useless rn because we dont detect ties
                 else:
                     return (None, 0)
             
-            #reached 0 depth
+            #reached 0 depth -- lets see how many 3's we have
             else:
-                return (None, 0)
+                return (None, self.threeInARow(state, prevPlayer))
         
         if (maximizingPlayer):
-            value = -100000
+            value = -math.inf
             for moves in self.possibleMoves(state):
                 newState = self.create_board_copy(state)
                 self.makeMove(newState, moves, currPlayer)
@@ -127,7 +178,7 @@ class connect4:
             return collumn, value
         
         else:
-            value = 100000
+            value = math.inf
             for moves in self.possibleMoves(state):
                 newState = self.create_board_copy(state)
                 self.makeMove(newState, moves, currPlayer)
@@ -204,7 +255,7 @@ class connect4:
             
             #AI Turn
             else:
-                collumn, value = self.minimax(board, 4, True)
+                collumn, value = self.minimax(board, 5, True)
                 if self.isValidMove(board, collumn):
                     print("AI playing on collumn "+str(collumn + 1))
                     self.makeMove(board, collumn, currTurn)
