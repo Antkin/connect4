@@ -104,7 +104,7 @@ class connect4:
         return count
     
     #Another heuristic function which will check how many "three in a row" cases there are. We only
-    #consider the cases where a 4th chip could be played
+    #consider the cases where a 4th chip could be played. The more 3 in a rows the better.
     def threeInARow(self, inputBoard, playerNum):
         count= 0
         #Check for horizontal threes aka -
@@ -114,13 +114,13 @@ class connect4:
                     #Check to the left as long as we are not at 0
                     if(collumn > 0):
                         if inputBoard[row][collumn - 1] == 0: 
-                            count += 10 - self.emptySpace(inputBoard, row, collumn - 1)
-                    
+                            count += 6 - self.emptySpace(inputBoard, row, collumn - 1)
+                            
                     #Check to the right
                     if (collumn < collumns - 3):
                         if inputBoard[row][collumn + 3] == 0: 
-                            count += 10 - self.emptySpace(inputBoard, row, collumn + 3)
-                
+                            count += 6 - self.emptySpace(inputBoard, row, collumn + 3)
+                            
         #Check for vertical threes aka |
         for collumn in range(collumns):
             for row in range(rows - 2):
@@ -137,14 +137,12 @@ class connect4:
                     #Check upper left pos
                     if(row > 0 and collumn > 0):
                         if inputBoard[row - 1][collumn - 1] == 0:
-                            count += 10 - self.emptySpace(inputBoard, row - 1, collumn - 1)
-
+                            count += 6 - self.emptySpace(inputBoard, row - 1, collumn - 1)
                     
                     #Check lower right pos
                     if(row < rows - 3 and collumn < collumns - 3):
                         if inputBoard[row + 3][collumn + 3] == 0:
-                            count += 10 - self.emptySpace(inputBoard, row + 3, collumn + 3)
-
+                            count += 6 - self.emptySpace(inputBoard, row + 3, collumn + 3)
                     
         #Check for forward slash type threes aka /
         for collumn in range(collumns-2):
@@ -153,15 +151,13 @@ class connect4:
                     #Check lower left pos
                     if(collumn > 0 and row < row - 1):
                         if inputBoard[row + 1][collumn - 1] == 0: 
-                            count += 10 - self.emptySpace(inputBoard, row + 1, collumn - 1)
-
+                            count += 6 - self.emptySpace(inputBoard, row + 1, collumn - 1)
                     
                     #Check upper right pos
                     if(collumn < collumns - 3 and row > 0):
                         if inputBoard[row - 1][collumn + 3] == 0:
-                            count += 10 - self.emptySpace(inputBoard, row - 1, collumn + 3)
-
-                
+                            count += 6 - self.emptySpace(inputBoard, row - 1, collumn + 3)
+            
         return count
     
     #Check for a tie
