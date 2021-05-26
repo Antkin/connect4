@@ -142,7 +142,7 @@ class connect4:
                     
                     #Check lower right pos
                     if(row < rows - 3 and collumn < collumns - 3):
-                        if inputBoard[row + 3][collumn + 3]:
+                        if inputBoard[row + 3][collumn + 3] == 0:
                             count += 10 - self.emptySpace(inputBoard, row + 3, collumn + 3)
 
                     
@@ -333,6 +333,10 @@ class connect4:
                                 gameOver = True
                                 print("Human winner!!!")
                                 
+                            if self.tieDetector(board):
+                                gameOver = True
+                                print("Tie detected!!!")
+                                
                             if(currTurn == 1):
                                 currTurn = 2
                             else:
@@ -353,6 +357,10 @@ class connect4:
                     if self.winningMove(board, currTurn):
                         gameOver = True
                         print("AI Winner!!!")
+                        
+                    if self.tieDetector(board):
+                        gameOver = True
+                        print("Tie detected!!!")
                         
                     if(currTurn == 1):
                         currTurn = 2
