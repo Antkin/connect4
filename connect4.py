@@ -108,10 +108,7 @@ class connect4:
     #x_xx and xx_x case.
     #For now we dont look at 2 in a rows
     def threeInARow(self, inputBoard, playerNum):
-        countPlayerNum = 0
-        countZero = 0
         heuristicValue = 0
-        zeroPos = []
                
         #In all cases we must ensure that that exactly 3 of the positions are the player number
         #and the fourth is a 0. If another players chips are in the way we cant play in any case
@@ -119,6 +116,7 @@ class connect4:
         #Check for horizontal 3's
         for collumn in range(collumns - 3):
             for row in range(rows):
+                #These values get reset every iteration
                 countPlayerNum = 0
                 countZero = 0
                 zeroPos = []
@@ -127,25 +125,25 @@ class connect4:
                     countPlayerNum += 1
                 elif inputBoard[row][collumn] == 0:
                     countZero += 1
-                    zeroPos.append(row, collumn)
+                    zeroPos.extend([row, collumn])
                     
                 if inputBoard[row][collumn+1] == playerNum:
                     countPlayerNum += 1
                 elif inputBoard[row][collumn+1] == 0:
                     countZero += 1
-                    zeroPos.append(row, collumn+1)
+                    zeroPos.extend([row, collumn+1])
                 
                 if inputBoard[row][collumn+2] == playerNum:
                     countPlayerNum += 1
                 elif inputBoard[row][collumn+2] == 0:
                     countZero += 1
-                    zeroPos.append(row, collumn+2)
+                    zeroPos.extend([row, collumn+2])
                     
                 if inputBoard[row][collumn+3] == playerNum:
                     countPlayerNum += 1
                 elif inputBoard[row][collumn+3] == 0:
                     countZero += 1
-                    zeroPos.append(row, collumn+3)
+                    zeroPos.extend([row, collumn+3])
                 
                 #Checking ONLY for cases where we have 3 of our players chips and one empty space
                 if countPlayerNum == 3 and countZero == 1:
@@ -153,25 +151,82 @@ class connect4:
                 
                     
        
-        #Check for vertical wins
+        #Check for vertical 3's, since these moves are easy to counter I weigh them lower
+        #This is an easy check because there is only one scenario
         for collumn in range(collumns):
             for row in range(rows - 3):
-                if inputBoard[row][collumn] == playerNum and inputBoard[row+1][collumn] == playerNum and inputBoard[row+2][collumn] == playerNum and inputBoard[row+3][collumn] == playerNum:
-                    return True
+                if inputBoard[row][collumn] == 0 and inputBoard[row+1][collumn] == playerNum and inputBoard[row+2][collumn] == playerNum and inputBoard[row+3][collumn] == playerNum:
+                    heuristicValue += 4
                 
-        #Check for backward slash type wins
+        #Check for backward slash type 3's
         for collumn in range(collumns-3):
             for row in range(rows-3):
-                if inputBoard[row][collumn] == playerNum and inputBoard[row+1][collumn+1] == playerNum and inputBoard[row+2][collumn+2] == playerNum and inputBoard[row+3][collumn+3] == playerNum:
-                    return True
+                countPlayerNum = 0
+                countZero = 0
+                zeroPos = []
+                
+                if inputBoard[row][collumn] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row][collumn] == 0:
+                    countZero += 1
+                    zeroPos.extend([row, collumn])
+                    
+                if inputBoard[row+1][collumn+1] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row+1][collumn+1] == 0:
+                    countZero += 1
+                    zeroPos.extend([row+1, collumn+1])
+                    
+                if inputBoard[row+2][collumn+2] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row+2][collumn+2] == 0:
+                    countZero += 1
+                    zeroPos.extend([row+2, collumn+2])
+                    
+                if inputBoard[row+3][collumn+3] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row+3][collumn+3] == 0:
+                    countZero += 1
+                    zeroPos.extend([row+3, collumn+3])
+                    
+                if countPlayerNum == 3 and countZero == 1:
+                    heuristicValue += 6 - self.emptySpace(inputBoard, zeroPos[0], zeroPos[1])
         
-        #Check for forward slash type wins
+        #Check for forward slash type 3's
         for collumn in range(collumns-3):
             for row in range(3, rows):
-                if inputBoard[row][collumn] == playerNum and inputBoard[row-1][collumn+1] == playerNum and inputBoard[row-2][collumn+2] == playerNum and inputBoard[row-3][collumn+3] == playerNum:
-                    return True
+                countPlayerNum = 0
+                countZero = 0
+                zeroPos = []
                 
-        return False
+                if inputBoard[row][collumn] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row][collumn] == 0:
+                    countZero += 1
+                    zeroPos.extend([row, collumn])
+                    
+                if inputBoard[row-1][collumn+1] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row-1][collumn+1] == 0:
+                    countZero += 1
+                    zeroPos.extend([row-1, collumn+1])
+                    
+                if inputBoard[row-2][collumn+2] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row-2][collumn+2] == 0:
+                    countZero += 1
+                    zeroPos.extend([row-2, collumn+2])
+                    
+                if inputBoard[row-3][collumn+3] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row-3][collumn+3] == 0:
+                    countZero += 1
+                    zeroPos.extend([row-3, collumn+3])
+                    
+                if countPlayerNum == 3 and countZero == 1:
+                    heuristicValue += 6 - self.emptySpace(inputBoard, zeroPos[0], zeroPos[1])
+                
+        return heuristicValue
     
     #Check for a tie
     def tieDetector(self, inputBoard):
