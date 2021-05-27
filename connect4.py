@@ -8,7 +8,7 @@ class connect4:
     global rows
     global collumns, empty, humanPlayer, aiPlayer
     global background, red_chip, yellow_chip, empty_chip
-    global squaresize, windowWidth, windowHeight, chipSlotRadius, screen
+    global squaresize, windowWidth, windowHeight, chipSlotRadius
     
     
     rows = 6
@@ -27,9 +27,6 @@ class connect4:
     windowWidth = squaresize * collumns
     windowHeight = squaresize * (rows + 1)
     chipSlotRadius = (squaresize // 2) - 5
-    
-    screen = pygame.display.set_mode((windowWidth, windowHeight))
-    pygame.init()
     
     #draws pygame board
     def draw_board(self, state):
@@ -291,7 +288,11 @@ class connect4:
                 
             else:
                 print("Unrecognized input, please enter 0, 1, or 2.")
-            
+        
+        
+        global screen
+        screen = pygame.display.set_mode((windowWidth, windowHeight))
+        pygame.init()
         board = self.create_new_board()
         self.draw_board(board)
         pygame.display.update()
