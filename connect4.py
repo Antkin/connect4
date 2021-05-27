@@ -266,7 +266,7 @@ class connect4:
         return False
         
     #Minimax algorithm -- the "brains" of the AI
-    def minimax(self, state, depth, maximizingPlayer):
+    def minimax(self, state, depth, maximizingPlayer, a, b):
         currPlayer = 0
         prevPlayer = 0
         if (maximizingPlayer):
@@ -304,11 +304,17 @@ class connect4:
             for moves in self.possibleMoves(state):
                 newState = self.create_board_copy(state)
                 self.makeMove(newState, moves, currPlayer)
-                move, newValue = self.minimax(newState, depth - 1, False)
-                #print("Move "+str(moves)+" results in value "+str(newValue))
+                move, newValue = self.minimax(newState, depth - 1, False, a, b)
+                #If we see a better heuristic value from a move update the best move
                 if newValue > value:
                     value = newValue
                     collumn = moves
+                    
+                #Update our alpha-beta values
+                a = max(a, value)
+                if a >= b:
+                    break
+                
             return collumn, value
         
         else:
@@ -316,18 +322,24 @@ class connect4:
             for moves in self.possibleMoves(state):
                 newState = self.create_board_copy(state)
                 self.makeMove(newState, moves, currPlayer)
-                move, newValue = self.minimax(newState, depth - 1, True)
+                move, newValue = self.minimax(newState, depth - 1, True, a, b)
                 
                 if newValue < value:
                     value = newValue
                     collumn = moves
+                    
+                #Update our alpha-beta values 
+                b = min(b, value)
+                if b <= a:
+                    break
+                
             return collumn, value
             
         
     #Handles the gameplay    
     def play(self):
         playerSelection = True
-        
+        firstTurn = True
         #currTurn = 1 means its the human player, currTurn = 2 means its the AI player
         currTurn = 0
         while(playerSelection):
@@ -411,7 +423,12 @@ class connect4:
             
             #AI Turn
             if (currTurn == 2 and not gameOver):
-                collumn, value = self.minimax(board, 4, True)
+                if firstTurn:
+                    collumn = 3
+                    firstTurn = False
+                else:
+                    collumn, value = self.minimax(board, 6, True, -math.inf, math.inf)
+                
                 if self.isValidMove(board, collumn):
                     print("AI playing on collumn "+str(collumn + 1))
                     self.makeMove(board, collumn, currTurn)
@@ -434,6 +451,7 @@ class connect4:
         if gameOver:
             while(True):
                 for event in pygame.event.get():
+                    self.draw_board(board)
                     if event.type == pygame.QUIT:
                         pygame.quit()
                         sys.exit()
