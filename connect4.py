@@ -103,62 +103,75 @@ class connect4:
         
         return count
     
-    #Another heuristic function which will check how many "three in a row" cases there are. We only
-    #consider the cases where a 4th chip could be played. The more 3 in a rows the better.
+    #Another heuristic function which will check how many "three in a row" cases there are. 
+    #Original heuristic only looked at _xxx and xxx_ case. This heuristic will also look at the 
+    #x_xx and xx_x case.
+    #For now we dont look at 2 in a rows
     def threeInARow(self, inputBoard, playerNum):
-        count= 0
-        #Check for horizontal threes aka -
-        for collumn in range(collumns - 2):
+        countPlayerNum = 0
+        countZero = 0
+        heuristicValue = 0
+        zeroPos = []
+               
+        #In all cases we must ensure that that exactly 3 of the positions are the player number
+        #and the fourth is a 0. If another players chips are in the way we cant play in any case
+        
+        #Check for horizontal 3's
+        for collumn in range(collumns - 3):
             for row in range(rows):
-                if inputBoard[row][collumn] == playerNum and inputBoard[row][collumn+1] == playerNum and inputBoard[row][collumn+2] == playerNum:
-                    #Check to the left as long as we are not at 0
-                    if(collumn > 0):
-                        if inputBoard[row][collumn - 1] == 0: 
-                            count += 6 - self.emptySpace(inputBoard, row, collumn - 1)
-                            
-                    #Check to the right
-                    if (collumn < collumns - 3):
-                        if inputBoard[row][collumn + 3] == 0: 
-                            count += 6 - self.emptySpace(inputBoard, row, collumn + 3)
-                            
-        #Check for vertical threes aka |
-        for collumn in range(collumns):
-            for row in range(rows - 2):
-                if inputBoard[row][collumn] == playerNum and inputBoard[row+1][collumn] == playerNum and inputBoard[row+2][collumn] == playerNum:
-                    #In the vertical case we just need to check placing a chip on top
-                    if(row > 0):
-                        if inputBoard[row-1][collumn] == 0: count += 5
-                        
+                countPlayerNum = 0
+                countZero = 0
+                zeroPos = []
                 
-        #Check for backward slash type threes aka \
-        for collumn in range(collumns-2):
-            for row in range(rows-2):
-                if inputBoard[row][collumn] == playerNum and inputBoard[row+1][collumn+1] == playerNum and inputBoard[row+2][collumn+2] == playerNum:
-                    #Check upper left pos
-                    if(row > 0 and collumn > 0):
-                        if inputBoard[row - 1][collumn - 1] == 0:
-                            count += 6 - self.emptySpace(inputBoard, row - 1, collumn - 1)
+                if inputBoard[row][collumn] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row][collumn] == 0:
+                    countZero += 1
+                    zeroPos.append(row, collumn)
                     
-                    #Check lower right pos
-                    if(row < rows - 3 and collumn < collumns - 3):
-                        if inputBoard[row + 3][collumn + 3] == 0:
-                            count += 6 - self.emptySpace(inputBoard, row + 3, collumn + 3)
+                if inputBoard[row][collumn+1] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row][collumn+1] == 0:
+                    countZero += 1
+                    zeroPos.append(row, collumn+1)
+                
+                if inputBoard[row][collumn+2] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row][collumn+2] == 0:
+                    countZero += 1
+                    zeroPos.append(row, collumn+2)
                     
-        #Check for forward slash type threes aka /
-        for collumn in range(collumns-2):
-            for row in range(2, rows):
-                if inputBoard[row][collumn] == playerNum and inputBoard[row-1][collumn+1] == playerNum and inputBoard[row-2][collumn+2] == playerNum:
-                    #Check lower left pos
-                    if(collumn > 0 and row < row - 1):
-                        if inputBoard[row + 1][collumn - 1] == 0: 
-                            count += 6 - self.emptySpace(inputBoard, row + 1, collumn - 1)
+                if inputBoard[row][collumn+3] == playerNum:
+                    countPlayerNum += 1
+                elif inputBoard[row][collumn+3] == 0:
+                    countZero += 1
+                    zeroPos.append(row, collumn+3)
+                
+                #Checking ONLY for cases where we have 3 of our players chips and one empty space
+                if countPlayerNum == 3 and countZero == 1:
+                    heuristicValue += 6 - self.emptySpace(inputBoard, zeroPos[0], zeroPos[1])
+                
                     
-                    #Check upper right pos
-                    if(collumn < collumns - 3 and row > 0):
-                        if inputBoard[row - 1][collumn + 3] == 0:
-                            count += 6 - self.emptySpace(inputBoard, row - 1, collumn + 3)
-            
-        return count
+       
+        #Check for vertical wins
+        for collumn in range(collumns):
+            for row in range(rows - 3):
+                if inputBoard[row][collumn] == playerNum and inputBoard[row+1][collumn] == playerNum and inputBoard[row+2][collumn] == playerNum and inputBoard[row+3][collumn] == playerNum:
+                    return True
+                
+        #Check for backward slash type wins
+        for collumn in range(collumns-3):
+            for row in range(rows-3):
+                if inputBoard[row][collumn] == playerNum and inputBoard[row+1][collumn+1] == playerNum and inputBoard[row+2][collumn+2] == playerNum and inputBoard[row+3][collumn+3] == playerNum:
+                    return True
+        
+        #Check for forward slash type wins
+        for collumn in range(collumns-3):
+            for row in range(3, rows):
+                if inputBoard[row][collumn] == playerNum and inputBoard[row-1][collumn+1] == playerNum and inputBoard[row-2][collumn+2] == playerNum and inputBoard[row-3][collumn+3] == playerNum:
+                    return True
+                
+        return False
     
     #Check for a tie
     def tieDetector(self, inputBoard):
