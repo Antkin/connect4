@@ -336,7 +336,7 @@ class connect4:
     #Handles the gameplay    
     def play(self):
         playerSelection = True
-        firstTurn = True
+        firstTurnAI = True
         #currTurn = 1 means its the human player, currTurn = 2 means its the AI player
         currTurn = 0
         while(playerSelection):
@@ -347,6 +347,7 @@ class connect4:
                 if (startingPlayer == 1):
                     print("Human plays first!")
                     currTurn = 1
+                    firstTurnAI = False
                 else:
                     print("AI plays first!")
                     currTurn = 2
@@ -359,6 +360,7 @@ class connect4:
                 print("Human plays first!")
                 currTurn = 1
                 playerSelection = False
+                firstTurnAI = False
             
             elif (val == '2'):
                 print("AI plays first!")
@@ -424,11 +426,11 @@ class connect4:
             
             #AI Turn
             if (currTurn == 2 and not gameOver):
-                if firstTurn:
+                if firstTurnAI:
                     collumn = 3
-                    firstTurn = False
+                    firstTurnAI = False
                 else:
-                    collumn, value = self.minimax(board, 6, True, -math.inf, math.inf)
+                    collumn, value = self.minimax(board, 3, True, -math.inf, math.inf)
                 
                 if self.isValidMove(board, collumn):
                     print("AI playing on collumn "+str(collumn + 1))
