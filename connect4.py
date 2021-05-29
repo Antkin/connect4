@@ -3,6 +3,7 @@ import random as rand
 import math
 import pygame
 import sys
+import pyttsx3 as tts
 
 class connect4:
     global rows
@@ -153,7 +154,7 @@ class connect4:
         for collumn in range(collumns):
             for row in range(rows - 3):
                 if inputBoard[row][collumn] == 0 and inputBoard[row+1][collumn] == playerNum and inputBoard[row+2][collumn] == playerNum and inputBoard[row+3][collumn] == playerNum:
-                    heuristicValue += 4
+                    heuristicValue += 3
                 
         #Check for backward slash type 3's
         for collumn in range(collumns-3):
@@ -335,6 +336,14 @@ class connect4:
         
     #Handles the gameplay    
     def play(self):
+        #Set up audio player
+        engine = tts.init()
+        #rate = engine.getProperty('rate')
+        engine.setProperty('rate', 150)
+        voices = engine.getProperty('voices')
+        #voices[0] is male, voices[1] is female
+        engine.setProperty('voice', voices[0].id)
+        
         playerSelection = True
         firstTurnAI = True
         #currTurn = 1 means its the human player, currTurn = 2 means its the AI player
@@ -430,21 +439,29 @@ class connect4:
                     collumn = 3
                     firstTurnAI = False
                 else:
-                    collumn, value = self.minimax(board, 3, True, -math.inf, math.inf)
+                    collumn, value = self.minimax(board, 7, True, -math.inf, math.inf)
                 
                 if self.isValidMove(board, collumn):
                     print("AI playing on collumn "+str(collumn + 1))
                     self.makeMove(board, collumn, currTurn)
-                    
                     self.draw_board(board)
+                    
+                    engine.say("AI Playing on callem "+str(collumn+1))
+                    engine.runAndWait()
+                    
+                    print(value)
                     
                     if self.winningMove(board, currTurn):
                         gameOver = True
                         print("AI Winner!!!")
+                        engine.say("Better luck next time puny human hahahahaha.")
+                        engine.runAndWait()
                         
                     if self.tieDetector(board):
                         gameOver = True
                         print("Tie detected!!!")
+                        engine.say("It seems I have met my match. Lets call this one a tie.")
+                        engine.runAndWait()
                         
                     if(currTurn == 1):
                         currTurn = 2
