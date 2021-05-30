@@ -156,7 +156,7 @@ class connect4:
         for collumn in range(collumns):
             for row in range(rows - 3):
                 if inputBoard[row][collumn] == 0 and inputBoard[row+1][collumn] == playerNum and inputBoard[row+2][collumn] == playerNum and inputBoard[row+3][collumn] == playerNum:
-                    heuristicValue += 3
+                    heuristicValue += 4
                 
         #Check for backward slash type 3's
         for collumn in range(collumns-3):
@@ -349,8 +349,6 @@ class connect4:
         #Set up mp3 player sounds
         blockingSounds = listdir("./connect4sounds/blockingMoves/")
         winningSound = listdir("./connect4sounds/winningMove/")
-        print(blockingSounds)
-        print(winningSound)
         
         playerSelection = True
         firstTurnAI = True
@@ -428,7 +426,7 @@ class connect4:
                             if self.winningMove(board, currTurn):
                                 gameOver = True
                                 print("Human winner!!!")
-                                engine.say("IMPOSSIBLE NOOOOOOOOOOOOO")
+                                engine.say("It seems I have lost this round.")
                                 engine.runAndWait()
                                 
                             if self.tieDetector(board):
@@ -453,8 +451,9 @@ class connect4:
                     collumn = 3
                     firstTurnAI = False
                 else:
-                    collumn, value = self.minimax(board, 5, True, -math.inf, math.inf)
-                
+                    collumn, value = self.minimax(board, 7, True, -math.inf, math.inf)
+                    print(value)
+                    
                 if self.isValidMove(board, collumn):
                     print("AI playing on collumn "+str(collumn + 1))
                     self.makeMove(board, collumn, currTurn)
