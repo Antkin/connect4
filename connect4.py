@@ -4,6 +4,8 @@ import math
 import pygame
 import sys
 import pyttsx3 as tts
+from playsound import playsound
+from os import listdir
 
 class connect4:
     global rows
@@ -261,7 +263,7 @@ class connect4:
                 if inputBoard[row][collumn] == playerNum and inputBoard[row-1][collumn+1] == playerNum and inputBoard[row-2][collumn+2] == playerNum and inputBoard[row-3][collumn+3] == playerNum:
                     return True
                 
-        return False
+        return False         
         
     #Minimax algorithm -- the "brains" of the AI
     def minimax(self, state, depth, maximizingPlayer, a, b):
@@ -344,6 +346,12 @@ class connect4:
         #voices[0] is male, voices[1] is female
         engine.setProperty('voice', voices[0].id)
         
+        #Set up mp3 player sounds
+        blockingSounds = listdir("./connect4sounds/blockingMoves/")
+        winningSound = listdir("./connect4sounds/winningMove/")
+        print(blockingSounds)
+        print(winningSound)
+        
         playerSelection = True
         firstTurnAI = True
         #currTurn = 1 means its the human player, currTurn = 2 means its the AI player
@@ -420,10 +428,14 @@ class connect4:
                             if self.winningMove(board, currTurn):
                                 gameOver = True
                                 print("Human winner!!!")
+                                engine.say("IMPOSSIBLE NOOOOOOOOOOOOO")
+                                engine.runAndWait()
                                 
                             if self.tieDetector(board):
                                 gameOver = True
                                 print("Tie detected!!!")
+                                engine.say("It seems I have met my match. Lets call this one a tie.")
+                                engine.runAndWait()
                                 
                             if(currTurn == 1):
                                 currTurn = 2
@@ -435,11 +447,13 @@ class connect4:
             
             #AI Turn
             if (currTurn == 2 and not gameOver):
+                boardCopy = self.create_board_copy(board)
+                
                 if firstTurnAI:
                     collumn = 3
                     firstTurnAI = False
                 else:
-                    collumn, value = self.minimax(board, 7, True, -math.inf, math.inf)
+                    collumn, value = self.minimax(board, 5, True, -math.inf, math.inf)
                 
                 if self.isValidMove(board, collumn):
                     print("AI playing on collumn "+str(collumn + 1))
@@ -449,15 +463,22 @@ class connect4:
                     engine.say("AI Playing on callem "+str(collumn+1))
                     engine.runAndWait()
                     
-                    print(value)
+                    #Check if we blocked an opponents connect 4
+                    #Play funny sound if so
+                    self.makeMove(boardCopy, collumn, 1)
+                    if self.winningMove(boardCopy, 1):
+                        playsound('./connect4sounds/blockingMoves/'+rand.choice(blockingSounds))
+                    
                     
                     if self.winningMove(board, currTurn):
                         gameOver = True
                         print("AI Winner!!!")
-                        engine.say("Better luck next time puny human hahahahaha.")
+                        engine.say("Better luck next time hahahahaha.")
                         engine.runAndWait()
                         
-                    if self.tieDetector(board):
+                        playsound('./connect4sounds/winningMove/'+rand.choice(winningSound))
+                        
+                    elif self.tieDetector(board):
                         gameOver = True
                         print("Tie detected!!!")
                         engine.say("It seems I have met my match. Lets call this one a tie.")
