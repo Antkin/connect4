@@ -107,7 +107,9 @@ class connect4:
     #Original heuristic only looked at _xxx and xxx_ case. This heuristic will also look at the 
     #x_xx and xx_x case.
     #For now we dont look at 2 in a rows
-    def threeInARow(self, inputBoard, playerNum):
+    def boardStateEvaluator(self, inputBoard):
+        aiPlayer = 2
+        humanPlayer = 1
         heuristicValue = 0
                
         #In all cases we must ensure that that exactly 3 of the positions are the player number
@@ -117,114 +119,107 @@ class connect4:
         for collumn in range(collumns - 3):
             for row in range(rows):
                 #These values get reset every iteration
-                countPlayerNum = 0
+                countAIPlayer = 0
+                countHumanPlayer = 0
                 countZero = 0
-                zeroPos = []
                 
-                if inputBoard[row][collumn] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row][collumn] == 0:
-                    countZero += 1
-                    zeroPos.extend([row, collumn])
+                if inputBoard[row][collumn] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row][collumn] == 0: countZero += 1
+                else: countHumanPlayer += 1
                     
-                if inputBoard[row][collumn+1] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row][collumn+1] == 0:
-                    countZero += 1
-                    zeroPos.extend([row, collumn+1])
+                    
+                if inputBoard[row][collumn+1] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row][collumn+1] == 0: countZero += 1
+                else: countHumanPlayer += 1
                 
-                if inputBoard[row][collumn+2] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row][collumn+2] == 0:
-                    countZero += 1
-                    zeroPos.extend([row, collumn+2])
+                if inputBoard[row][collumn+2] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row][collumn+2] == 0: countZero += 1
+                else: countHumanPlayer += 1
                     
-                if inputBoard[row][collumn+3] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row][collumn+3] == 0:
-                    countZero += 1
-                    zeroPos.extend([row, collumn+3])
+                if inputBoard[row][collumn+3] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row][collumn+3] == 0: countZero += 1
+                else: countHumanPlayer += 1
                 
                 #Checking ONLY for cases where we have 3 of our players chips and one empty space
-                if countPlayerNum == 3 and countZero == 1:
-                    heuristicValue += 6 - self.emptySpace(inputBoard, zeroPos[0], zeroPos[1])
-                
+                if countAIPlayer == 3 and countZero == 1:
+                    heuristicValue += 10
+                elif countAIPlayer == 2 and countZero == 2:
+                    heuristicValue += 5
+                elif countHumanPlayer == 3 and countZero == 1:
+                    heuristicValue += -5
                     
        
         #Check for vertical 3's, since these moves are easy to counter I weigh them lower
         #This is an easy check because there is only one scenario
         for collumn in range(collumns):
             for row in range(rows - 3):
-                if inputBoard[row][collumn] == 0 and inputBoard[row+1][collumn] == playerNum and inputBoard[row+2][collumn] == playerNum and inputBoard[row+3][collumn] == playerNum:
-                    heuristicValue += 4
+                if inputBoard[row][collumn] == 0 and inputBoard[row+1][collumn] == aiPlayer and inputBoard[row+2][collumn] == aiPlayer and inputBoard[row+3][collumn] == aiPlayer:
+                    heuristicValue += 10
+                elif inputBoard[row][collumn] == 0 and inputBoard[row+1][collumn] == 0 and inputBoard[row+2][collumn] == aiPlayer and inputBoard[row+3][collumn] == aiPlayer:
+                    heuristicValue += 5
+                elif inputBoard[row][collumn] == 0 and inputBoard[row+1][collumn] == humanPlayer and inputBoard[row+2][collumn] == humanPlayer and inputBoard[row+3][collumn] == humanPlayer:
+                    heuristicValue += -5
+
                 
         #Check for backward slash type 3's
         for collumn in range(collumns-3):
             for row in range(rows-3):
-                countPlayerNum = 0
+                countAIPlayer = 0
+                countHumanPlayer = 0
                 countZero = 0
-                zeroPos = []
                 
-                if inputBoard[row][collumn] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row][collumn] == 0:
-                    countZero += 1
-                    zeroPos.extend([row, collumn])
+                if inputBoard[row][collumn] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row][collumn] == 0: countZero += 1
+                else: countHumanPlayer += 1
                     
-                if inputBoard[row+1][collumn+1] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row+1][collumn+1] == 0:
-                    countZero += 1
-                    zeroPos.extend([row+1, collumn+1])
+                if inputBoard[row+1][collumn+1] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row+1][collumn+1] == 0: countZero += 1
+                else: countHumanPlayer += 1
                     
-                if inputBoard[row+2][collumn+2] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row+2][collumn+2] == 0:
-                    countZero += 1
-                    zeroPos.extend([row+2, collumn+2])
+                if inputBoard[row+2][collumn+2] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row+2][collumn+2] == 0: countZero += 1
+                else: countHumanPlayer += 1
                     
-                if inputBoard[row+3][collumn+3] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row+3][collumn+3] == 0:
-                    countZero += 1
-                    zeroPos.extend([row+3, collumn+3])
+                if inputBoard[row+3][collumn+3] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row+3][collumn+3] == 0: countZero += 1
+                else: countHumanPlayer += 1
                     
-                if countPlayerNum == 3 and countZero == 1:
-                    heuristicValue += 6 - self.emptySpace(inputBoard, zeroPos[0], zeroPos[1])
+                if countAIPlayer == 3 and countZero == 1:
+                    heuristicValue += 10
+                elif countAIPlayer == 2 and countZero == 2:
+                    heuristicValue += 5
+                elif countHumanPlayer == 3 and countZero == 1:
+                    heuristicValue += -5
         
         #Check for forward slash type 3's
         for collumn in range(collumns-3):
             for row in range(3, rows):
-                countPlayerNum = 0
+                countAIPlayer = 0
+                countHumanPlayer = 0
                 countZero = 0
-                zeroPos = []
                 
-                if inputBoard[row][collumn] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row][collumn] == 0:
-                    countZero += 1
-                    zeroPos.extend([row, collumn])
+                if inputBoard[row][collumn] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row][collumn] == 0: countZero += 1
+                else: countHumanPlayer += 1
                     
-                if inputBoard[row-1][collumn+1] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row-1][collumn+1] == 0:
-                    countZero += 1
-                    zeroPos.extend([row-1, collumn+1])
+                if inputBoard[row-1][collumn+1] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row-1][collumn+1] == 0: countZero += 1
+                else: countHumanPlayer += 1
                     
-                if inputBoard[row-2][collumn+2] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row-2][collumn+2] == 0:
-                    countZero += 1
-                    zeroPos.extend([row-2, collumn+2])
+                if inputBoard[row-2][collumn+2] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row-2][collumn+2] == 0: countZero += 1
+                else: countHumanPlayer += 1
                     
-                if inputBoard[row-3][collumn+3] == playerNum:
-                    countPlayerNum += 1
-                elif inputBoard[row-3][collumn+3] == 0:
-                    countZero += 1
-                    zeroPos.extend([row-3, collumn+3])
+                if inputBoard[row-3][collumn+3] == aiPlayer: countAIPlayer += 1
+                elif inputBoard[row-3][collumn+3] == 0: countZero += 1
+                else: countHumanPlayer += 1
                     
-                if countPlayerNum == 3 and countZero == 1:
-                    heuristicValue += 6 - self.emptySpace(inputBoard, zeroPos[0], zeroPos[1])
+                if countAIPlayer == 3 and countZero == 1:
+                    heuristicValue += 10
+                elif countAIPlayer == 2 and countZero == 2:
+                    heuristicValue += 5
+                elif countHumanPlayer == 3 and countZero == 1:
+                    heuristicValue += -5
                 
         return heuristicValue
     
@@ -267,44 +262,33 @@ class connect4:
         
     #Minimax algorithm -- the "brains" of the AI
     def minimax(self, state, depth, maximizingPlayer, a, b):
-        currPlayer = 0
-        prevPlayer = 0
-        if (maximizingPlayer):
-            currPlayer = 2
-            prevPlayer = 1
-        else:
-            currPlayer = 1
-            prevPlayer = 2
+        aiPlayer = 2
+        humanPlayer = 1
         
-        gameOver = self.winningMove(state, prevPlayer)
+        gameWinAI = self.winningMove(state, aiPlayer)
+        gameWinHuman = self.winningMove(state, humanPlayer)
         tie = self.tieDetector(state)
         
-        if (depth == 0) or gameOver or tie:
-            if gameOver:
-                #print("EOG Scenario detected for player "+str(prevPlayer))
-                #Human win
-                if (prevPlayer == 1):
-                    return (None, -100000 * (depth + 1))
-                #AI win
-                elif (prevPlayer == 2):
-                    return (None, 100000 * (depth + 1))
-                #No win -- kind of useless rn because we dont detect ties
-            elif tie:
-                return (None, 0)
+        if depth == 0 or gameWinAI or gameWinHuman or tie:
+            #AI Win
+            if gameWinAI: return (None, 1000000 * (depth + 1))
+            #Human Win
+            elif gameWinHuman: return (None, -1000000 * (depth + 1))
             
-            #reached 0 depth -- lets see how many 3's we have
-            else:
-                if prevPlayer == 1:
-                    return (None, -self.threeInARow(state, prevPlayer))
-                else:
-                    return (None, self.threeInARow(state, prevPlayer))
+            #No win
+            elif tie: return (None, 0)
+            
+            #reached 0 depth -- lets evaluate the board state
+            else: return (None, self.boardStateEvaluator(state))
         
+    
         if (maximizingPlayer):
             value = -math.inf
             for moves in self.possibleMoves(state):
                 newState = self.create_board_copy(state)
-                self.makeMove(newState, moves, currPlayer)
+                self.makeMove(newState, moves, aiPlayer)
                 move, newValue = self.minimax(newState, depth - 1, False, a, b)
+                                
                 #If we see a better heuristic value from a move update the best move
                 if newValue > value:
                     value = newValue
@@ -314,14 +298,14 @@ class connect4:
                 a = max(a, value)
                 if a >= b:
                     break
-                
+            
             return collumn, value
         
         else:
             value = math.inf
             for moves in self.possibleMoves(state):
                 newState = self.create_board_copy(state)
-                self.makeMove(newState, moves, currPlayer)
+                self.makeMove(newState, moves, humanPlayer)
                 move, newValue = self.minimax(newState, depth - 1, True, a, b)
                 
                 if newValue < value:
@@ -451,7 +435,7 @@ class connect4:
                     collumn = 3
                     firstTurnAI = False
                 else:
-                    collumn, value = self.minimax(board, 7, True, -math.inf, math.inf)
+                    collumn, value = self.minimax(board, 6, True, -math.inf, math.inf)
                     print(value)
                     
                 if self.isValidMove(board, collumn):
