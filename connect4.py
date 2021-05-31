@@ -267,44 +267,33 @@ class connect4:
         
     #Minimax algorithm -- the "brains" of the AI
     def minimax(self, state, depth, maximizingPlayer, a, b):
-        currPlayer = 0
-        prevPlayer = 0
-        if (maximizingPlayer):
-            currPlayer = 2
-            prevPlayer = 1
-        else:
-            currPlayer = 1
-            prevPlayer = 2
+        aiPlayer = 2
+        humanPlayer = 1
         
-        gameOver = self.winningMove(state, prevPlayer)
+        gameWinAI = self.winningMove(state, aiPlayer)
+        gameWinHuman = self.winningMove(state, humanPlayer)
         tie = self.tieDetector(state)
         
-        if (depth == 0) or gameOver or tie:
-            if gameOver:
-                #print("EOG Scenario detected for player "+str(prevPlayer))
-                #Human win
-                if (prevPlayer == 1):
-                    return (None, -100000 * (depth + 1))
-                #AI win
-                elif (prevPlayer == 2):
-                    return (None, 100000 * (depth + 1))
-                #No win -- kind of useless rn because we dont detect ties
-            elif tie:
-                return (None, 0)
+        if depth == 0 or gameWinAI or gameWinHuman or tie:
+            #AI Win
+            if gameWinAI: return (None, 1000000)
+            #Human Win
+            elif gameWinHuman: return (None, -1000000)
+            
+            #No win -- kind of useless rn because we dont detect ties
+            elif tie: return (None, 0)
             
             #reached 0 depth -- lets see how many 3's we have
-            else:
-                if prevPlayer == 1:
-                    return (None, -self.threeInARow(state, prevPlayer))
-                else:
-                    return (None, self.threeInARow(state, prevPlayer))
+            else: return (None, self.threeInARow(state, aiPlayer))
         
+    
         if (maximizingPlayer):
             value = -math.inf
             for moves in self.possibleMoves(state):
                 newState = self.create_board_copy(state)
-                self.makeMove(newState, moves, currPlayer)
+                self.makeMove(newState, moves, aiPlayer)
                 move, newValue = self.minimax(newState, depth - 1, False, a, b)
+                                
                 #If we see a better heuristic value from a move update the best move
                 if newValue > value:
                     value = newValue
@@ -314,14 +303,14 @@ class connect4:
                 a = max(a, value)
                 if a >= b:
                     break
-                
+            
             return collumn, value
         
         else:
             value = math.inf
             for moves in self.possibleMoves(state):
                 newState = self.create_board_copy(state)
-                self.makeMove(newState, moves, currPlayer)
+                self.makeMove(newState, moves, humanPlayer)
                 move, newValue = self.minimax(newState, depth - 1, True, a, b)
                 
                 if newValue < value:
