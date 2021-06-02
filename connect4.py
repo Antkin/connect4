@@ -379,7 +379,7 @@ class connect4:
         pygame.display.update()
         gameOver = False
         
-        while (not gameOver):
+        while (True):
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -466,7 +466,7 @@ class connect4:
                         engine.say("Better luck next time hahahahaha.")
                         engine.runAndWait()
                         
-                        playsound('./connect4sounds/winningMove/'+rand.choice(winningSound))
+                        #playsound('./connect4sounds/winningMove/'+rand.choice(winningSound))
                         
                     elif self.tieDetector(board):
                         gameOver = True
@@ -479,14 +479,31 @@ class connect4:
                     else:
                         currTurn = 1
         
-        if gameOver:
-            while(True):
-                for event in pygame.event.get():
-                    self.draw_board(board)
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
-                        return 0
+            if gameOver:
+                pygame.font.init()
+                font = pygame.font.SysFont(None, 80)
+                gameover = font.render("GAMEOVER: Press R to restart", 1, (0, 204, 0))
+                banner = gameover.get_rect()
+                banner.center = screen.get_rect().center
+                screen.blit(gameover, banner)
+                
+                while(gameOver):        
+                    for event in pygame.event.get():
+                        print(str(event))
+                        #self.draw_board(board)
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            sys.exit()
+                            return 0
+                        
+                        if event.type == pygame.KEYDOWN:
+                            if event.key == pygame.K_r:
+                                gameOver = False
+                                board = self.create_new_board()
+                                self.draw_board(board)
+                                pygame.display.update()
+                                print("Pressed reset!")
+                                break
                         
 game = connect4()
 game.play()
