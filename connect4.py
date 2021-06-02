@@ -435,8 +435,15 @@ class connect4:
                     collumn = 3
                     firstTurnAI = False
                 else:
-                    collumn, value = self.minimax(board, 6, True, -math.inf, math.inf)
+                    collumn, value = self.minimax(board, 4, True, -math.inf, math.inf)
                     print(value)
+                    if value >= 1000000:
+                        engine.say("You might not know it yet but you have lost hahahahahahahahaha")
+                        engine.runAndWait()
+                    elif value <= -1000000:
+                        engine.say("This is not looking good for me")
+                        engine.runAndWait()
+                    
                     
                 if self.isValidMove(board, collumn):
                     print("AI playing on collumn "+str(collumn + 1))
